@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProgressBar } from "@/components/onboarding/ProgressBar";
 import { QuestionCard } from "@/components/onboarding/QuestionCard";
 import { OptionButton } from "@/components/onboarding/OptionButton";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { Target, TrendingDown, TrendingUp, Minus } from "lucide-react";
+
+// novos componentes
+import { DOBPicker } from "@/components/onboarding/DOBPicker";
+import { MultiSelectButtons } from "@/components/onboarding/MultiSelectButtons";
+import { LoadingScreen } from "@/components/onboarding/LoadingScreen";
+import { PlanCards } from "@/components/onboarding/PlanCards";
+import { Paywall } from "@/components/onboarding/Paywall";
 
 const Onboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -17,6 +24,10 @@ const Onboarding = () => {
 
   const nextStep = () => {
     setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+  };
+
+  const prevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   const renderStep = () => {
@@ -137,6 +148,207 @@ const Onboarding = () => {
               />
             </div>
             <ContinueButton onClick={nextStep} text="Continuar" />
+          </QuestionCard>
+        );
+
+      // Tela 5: Gênero
+      case 5:
+        return (
+          <QuestionCard title="Escolha seu gênero." subtitle="Isso será usado para calibrar seu plano personalizado.">
+            <div className="space-y-4">
+              <OptionButton selected={answers.gender === "male"} onClick={() => handleAnswer("gender", "male")}>Masculino</OptionButton>
+              <OptionButton selected={answers.gender === "female"} onClick={() => handleAnswer("gender", "female")}>Feminino</OptionButton>
+              <OptionButton selected={answers.gender === "other"} onClick={() => handleAnswer("gender", "other")}>Outro</OptionButton>
+            </div>
+            <ContinueButton onClick={nextStep} disabled={!answers.gender} />
+          </QuestionCard>
+        );
+
+      // Tela 6: Data de Nascimento
+      case 6:
+        return (
+          <QuestionCard title="Quando você nasceu?" subtitle="Isso será usado para calibrar seu plano personalizado.">
+            <div className="py-6">
+              <DOBPicker
+                value={answers.dob}
+                onChange={(dob) => handleAnswer("dob", dob)}
+              />
+            </div>
+            <ContinueButton onClick={nextStep} disabled={!answers.dob?.year || !answers.dob?.month || !answers.dob?.day} />
+          </QuestionCard>
+        );
+
+      // Tela 7: Hábitos de Treino
+      case 7:
+        return (
+          <QuestionCard title="Quantos treinos você faz por semana?">
+            <div className="space-y-4">
+              <OptionButton selected={answers.workouts === "0-2"} onClick={() => handleAnswer("workouts", "0-2")}>0-2</OptionButton>
+              <OptionButton selected={answers.workouts === "3-5"} onClick={() => handleAnswer("workouts", "3-5")}>3-5</OptionButton>
+              <OptionButton selected={answers.workouts === "6+"} onClick={() => handleAnswer("workouts", "6+")}>6+</OptionButton>
+            </div>
+            <ContinueButton onClick={nextStep} disabled={!answers.workouts} />
+          </QuestionCard>
+        );
+
+      // Tela 8: Desafios Pessoais (multi-select)
+      case 8:
+        return (
+          <QuestionCard title="O que está impedindo você de alcançar seus objetivos?">
+            <MultiSelectButtons
+              options={[
+
+                "Falta de consistência",
+                "Hábitos alimentares não saudáveis",
+                "Falta de suporte",
+                "Agenda cheia",
+                "Falta de inspiração para refeições",
+              ]}
+              value={answers.challenges || []}
+              onChange={(v) => handleAnswer("challenges", v)}
+            />
+            <ContinueButton onClick={nextStep} disabled={!answers.challenges || answers.challenges.length === 0} />
+          </QuestionCard>
+        );
+
+      // Tela 9: Motivações Secundárias (multi-select)
+      case 9:
+        return (
+          <QuestionCard title="O que você gostaria de realizar?">
+            <MultiSelectButtons
+              options={[
+                "Comer e viver de forma mais saudável",
+                "Aumentar minha energia e humor",
+                "Me manter motivado e consistente",
+                "Me sentir melhor com meu corpo",
+              ]}
+              value={answers.motivations || []}
+              onChange={(v) => handleAnswer("motivations", v)}
+            />
+            <ContinueButton onClick={nextStep} disabled={!answers.motivations || answers.motivations.length === 0} />
+          </QuestionCard>
+        );
+
+      // Tela 10: Dieta Específica
+      case 10:
+        return (
+          <QuestionCard title="Você segue uma dieta específica?">
+            <div className="space-y-4">
+              {["Clássico", "Pescetariano", "Vegetariano", "Vegano"].map((d) => (
+                <OptionButton key={d} selected={answers.diet === d} onClick={() => handleAnswer("diet", d)}>
+                  {d}
+                </OptionButton>
+              ))}
+            </div>
+            <ContinueButton onClick={nextStep} />
+          </QuestionCard>
+        );
+
+      // Tela 11: Experiência Prévia
+      case 11:
+        return (
+          <QuestionCard title="Você já experimentou outros aplicativos de contagem de calorias?">
+            <div className="space-y-4">
+              <OptionButton selected={answers.experience === "no"} onClick={() => handleAnswer("experience", "no")}>Não</OptionButton>
+              <OptionButton selected={answers.experience === "yes"} onClick={() => handleAnswer("experience", "yes")}>Sim</OptionButton>
+            </div>
+            <ContinueButton onClick={nextStep} />
+          </QuestionCard>
+        );
+
+      // Tela 12: Canal de Aquisição
+      case 12:
+        return (
+          <QuestionCard title="Onde você ouviu falar de nós?">
+            <div className="space-y-4">
+              {["Google","Instagram","App Store","X","Youtube","Facebook","Amigo ou família"].map((c) => (
+                <OptionButton key={c} selected={answers.channel === c} onClick={() => handleAnswer("channel", c)}>{c}</OptionButton>
+              ))}
+            </div>
+            <ContinueButton onClick={nextStep} />
+          </QuestionCard>
+        );
+
+      // Tela 13: Integração Saúde (Opcional)
+      case 13:
+        return (
+          <QuestionCard title="Conecte-se ao Apple Saúde." subtitle="Sincronize suas atividades diárias para ter os dados mais completos.">
+            <div className="py-12 flex flex-col gap-3 items-center">
+              <button className="w-full max-w-md btn-primary" onClick={() => { handleAnswer("health_sync", true); nextStep(); }}>
+                Continuar
+              </button>
+              <button className="w-full max-w-md btn-ghost" onClick={() => { handleAnswer("health_sync", false); nextStep(); }}>
+                Agora não
+              </button>
+            </div>
+          </QuestionCard>
+        );
+
+      // Tela 14: Confiança e Privacidade
+      case 14:
+        return (
+          <QuestionCard title="Obrigado por confiar em nós." subtitle="Agora vamos personalizar o Kalorix para você...">
+            <div className="bg-card border p-4 rounded-md text-sm text-muted-foreground">
+              <strong>Privacidade:</strong> Seus dados são criptografados e usados apenas para personalizar seu plano. Você pode remover o acesso a qualquer momento.
+            </div>
+            <ContinueButton onClick={nextStep} />
+          </QuestionCard>
+        );
+
+      // Tela 15: Tela de Carregamento animada
+      case 15:
+        return (
+          <LoadingScreen
+            onComplete={() => {
+              // deixa a sensação de carregamento antes de mostrar plano
+              setTimeout(() => nextStep(), 800);
+            }}
+          />
+        );
+
+      // Tela 16: Seu Plano Personalizado
+      case 16:
+        return (
+          <QuestionCard title="Parabéns, seu plano personalizado está pronto!" subtitle={`Ex: Aumente 20 kg peso até março 1, 2026`}>
+            <PlanCards data={{
+              calories: answers.calories || 2200,
+              carbs: answers.carbs || 300,
+              protein: answers.protein || 120,
+              fats: answers.fats || 70,
+            }} />
+            <ContinueButton onClick={nextStep} text="Vamos começar!" />
+          </QuestionCard>
+        );
+
+      // Tela 17: Apresentação de Feature (Opcional)
+      case 17:
+        return (
+          <QuestionCard title="Sabia que pode transferir calorias extras para o próximo dia?">
+            <div className="py-8 text-center">
+              <div className="mb-6">[Animação curta mostrando transferência]</div>
+              <ContinueButton onClick={nextStep} text="Entendido!" />
+            </div>
+          </QuestionCard>
+        );
+
+      // Tela 18: Oferta Exclusiva (Paywall)
+      case 18:
+        return (
+          <Paywall onSkip={() => nextStep()} />
+        );
+
+      // Tela 19: Conclusão e Início
+      case 19:
+        return (
+          <QuestionCard title="Tudo pronto!" subtitle="Sua jornada para uma vida mais saudável começa agora.">
+            <div className="py-8 text-center">
+              <button className="w-full max-w-md btn-primary" onClick={() => {
+                // finalizar e redirecionar para a aplicação principal
+                window.location.href = "/";
+              }}>
+                Começar a usar
+              </button>
+            </div>
           </QuestionCard>
         );
 
