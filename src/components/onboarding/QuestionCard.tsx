@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import logo from "@/assets/ChatGPT Image 13 de out. de 2025, 17_37_01.png";
 
 interface QuestionCardProps {
   title: string;
@@ -13,7 +14,7 @@ export const QuestionCard = ({
   title,
   subtitle,
   children,
-  imageSrc = "src/assets/ChatGPT Image 13 de out. de 2025, 17_37_01.png",
+  imageSrc = logo,
   imageAlt,
   imageClassName = "",
 }: QuestionCardProps) => {

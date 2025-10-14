@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ProgressBar } from "@/components/onboarding/ProgressBar";
 import { QuestionCard } from "@/components/onboarding/QuestionCard";
 import { OptionButton } from "@/components/onboarding/OptionButton";
@@ -13,10 +14,17 @@ import { PlanCards } from "@/components/onboarding/PlanCards";
 import { Paywall } from "@/components/onboarding/Paywall";
 
 const Onboarding = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
-
   const totalSteps = 19;
+  const params = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const paramStep = params.step ? parseInt(params.step, 10) : undefined;
+
+  const [currentStep, setCurrentStep] = useState<number>(() =>
+    paramStep && !isNaN(paramStep) ? Math.max(1, Math.min(paramStep, totalSteps)) : 1
+  );
+
+  const [answers, setAnswers] = useState<Record<string, any>>({});
 
   const handleAnswer = (key: string, value: any) => {
     setAnswers({ ...answers, [key]: value });
@@ -31,6 +39,23 @@ const Onboarding = () => {
   };
 
   const renderStep = () => {
+    // If route has no step param and path is /onboarding, show intro screen
+    if (!params.step && location.pathname === "/onboarding") {
+      return (
+        <QuestionCard title="Bem-vindo ao Kalorix" subtitle="Vamos personalizar seu plano rápido e fácil.">
+          <div className="py-6 text-center">
+            <p className="text-sm text-muted-foreground mb-6">Responda algumas perguntas rápidas para começar.</p>
+            <div className="flex flex-col items-center gap-3">
+              <button className="w-full max-w-md btn-primary" onClick={() => navigate("/onboarding/page/1")}>
+                Começar
+              </button>
+              <button className="w-full max-w-md btn-ghost" onClick={() => navigate("/")}>Voltar</button>
+            </div>
+          </div>
+        </QuestionCard>
+      );
+    }
+
     switch (currentStep) {
       case 1:
         return (
@@ -365,6 +390,33 @@ const Onboarding = () => {
         );
     }
   };
+
+  // Sync currentStep -> URL
+  useEffect(() => {
+    try {
+      // don't auto-redirect when we're at the onboarding root (intro screen)
+      if (location.pathname === "/onboarding" && !params.step) return;
+
+      const base = location.pathname.startsWith("/onboarding") ? "/onboarding/page" : "/page";
+      const target = `${base}/${currentStep}`;
+      if (!location.pathname.endsWith(`/${currentStep}`)) {
+        navigate(target, { replace: true });
+      }
+    } catch (e) {
+      // ignore navigation errors in dev
+    }
+  }, [currentStep, location.pathname, navigate]);
+
+  // Sync URL -> currentStep when param changes (e.g. user edits URL)
+  useEffect(() => {
+    if (params.step) {
+      const s = parseInt(params.step, 10);
+      if (!isNaN(s) && s !== currentStep) {
+        setCurrentStep(Math.max(1, Math.min(s, totalSteps)));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.step]);
 
   return (
     <div className="min-h-screen bg-background">
