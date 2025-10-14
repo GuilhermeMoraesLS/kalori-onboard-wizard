@@ -39,23 +39,6 @@ const Onboarding = () => {
   };
 
   const renderStep = () => {
-    // If route has no step param and path is /onboarding, show intro screen
-    if (!params.step && location.pathname === "/onboarding") {
-      return (
-        <QuestionCard title="Bem-vindo ao Kalorix" subtitle="Vamos personalizar seu plano rápido e fácil.">
-          <div className="py-6 text-center">
-            <p className="text-sm text-muted-foreground mb-6">Responda algumas perguntas rápidas para começar.</p>
-            <div className="flex flex-col items-center gap-3">
-              <button className="w-full max-w-md btn-primary" onClick={() => navigate("/onboarding/page/1")}>
-                Começar
-              </button>
-              <button className="w-full max-w-md btn-ghost" onClick={() => navigate("/")}>Voltar</button>
-            </div>
-          </div>
-        </QuestionCard>
-      );
-    }
-
     switch (currentStep) {
       case 1:
         return (
@@ -395,9 +378,7 @@ const Onboarding = () => {
   useEffect(() => {
     try {
       // don't auto-redirect when we're at the onboarding root (intro screen)
-      if (location.pathname === "/onboarding" && !params.step) return;
-
-      const base = location.pathname.startsWith("/onboarding") ? "/onboarding/page" : "/page";
+      const base = "/page";
       const target = `${base}/${currentStep}`;
       if (!location.pathname.endsWith(`/${currentStep}`)) {
         navigate(target, { replace: true });

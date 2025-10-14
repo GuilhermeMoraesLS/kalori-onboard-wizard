@@ -24,9 +24,10 @@ const Index = () => {
 
         <div className="flex flex-col items-center gap-4 pt-8">
           <Button
-            onClick={() => navigate("/onboarding")}
+            onClick={() => navigate("/page/1")}
+            variant="default"
             size="lg"
-            className="h-14 px-8 text-lg font-semibold rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
+            className="h-14 text-lg font-semibold rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
           >
             Começar agora
             <ArrowRight className="ml-2 w-5 h-5" />
