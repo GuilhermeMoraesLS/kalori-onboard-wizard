@@ -12,9 +12,10 @@ import { MultiSelectButtons } from "@/components/onboarding/MultiSelectButtons";
 import { LoadingScreen } from "@/components/onboarding/LoadingScreen";
 import { PlanCards } from "@/components/onboarding/PlanCards";
 import { Paywall } from "@/components/onboarding/Paywall";
+import { Button } from "@/components/ui/button";
 
 const Onboarding = () => {
-  const totalSteps = 19;
+  const totalSteps = 15;
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -277,23 +278,10 @@ const Onboarding = () => {
           </QuestionCard>
         );
 
-      // Tela 13: Integração Saúde (Opcional)
-      case 13:
-        return (
-          <QuestionCard title="Conecte-se ao Apple Saúde." subtitle="Sincronize suas atividades diárias para ter os dados mais completos.">
-            <div className="py-12 flex flex-col gap-3 items-center">
-              <button className="w-full max-w-md btn-primary" onClick={() => { handleAnswer("health_sync", true); nextStep(); }}>
-                Continuar
-              </button>
-              <button className="w-full max-w-md btn-ghost" onClick={() => { handleAnswer("health_sync", false); nextStep(); }}>
-                Agora não
-              </button>
-            </div>
-          </QuestionCard>
-        );
+
 
       // Tela 14: Confiança e Privacidade
-      case 14:
+      case 13:
         return (
           <QuestionCard title="Obrigado por confiar em nós." subtitle="Agora vamos personalizar o Kalorix para você...">
             <div className="bg-card border p-4 rounded-md text-sm text-muted-foreground">
@@ -304,7 +292,7 @@ const Onboarding = () => {
         );
 
       // Tela 15: Tela de Carregamento animada
-      case 15:
+      case 14:
         return (
           <LoadingScreen
             onComplete={() => {
@@ -314,51 +302,54 @@ const Onboarding = () => {
           />
         );
 
-      // Tela 16: Seu Plano Personalizado
-      case 16:
-        return (
-          <QuestionCard title="Parabéns, seu plano personalizado está pronto!" subtitle={`Ex: Aumente 20 kg peso até março 1, 2026`}>
-            <PlanCards data={{
-              calories: answers.calories || 2200,
-              carbs: answers.carbs || 300,
-              protein: answers.protein || 120,
-              fats: answers.fats || 70,
-            }} />
-            <ContinueButton onClick={nextStep} text="Vamos começar!" />
-          </QuestionCard>
-        );
+      // Tela 16: Seu Plano Personalizado — direciona para WhatsApp
+      case 15:
+        
+        const waLink = `https://wa.me/5521982482829?text=Olá! Quero experimentar a versão gratuita do Kalorix`;
 
-      // Tela 17: Apresentação de Feature (Opcional)
-      case 17:
         return (
-          <QuestionCard title="Sabia que pode transferir calorias extras para o próximo dia?">
-            <div className="py-8 text-center">
-              <div className="mb-6">[Animação curta mostrando transferência]</div>
-              <ContinueButton onClick={nextStep} text="Entendido!" />
+          <QuestionCard
+            title="Quase lá — seu plano está quase pronto!"
+            subtitle="Toque no botão abaixo para acessar o Kalorix. É rápido, seguro e vai direto para você."
+          >
+            <div className="flex flex-col items-center gap-6 mt-6">
+              <div className="w-40 h-40 rounded-full bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center shadow-2xl">
+                <div className="w-28 h-28 rounded-full bg-black/20 flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-4xl">📩</span>
+                </div>
+              </div>
+
+              <p className="text-center text-lg text-foreground max-w-md leading-relaxed">
+                Montamos um plano pensado especialmente em você — com metas, refeições e dicas práticas.
+                Para ter acesso ao kalorix grátis, clique em "Ir para o WhatsApp". Em seguida, você vai pode começar a sua jornada rumo a reprogramação nutricional.
+              </p>
+
+              <div className="w-full max-w-md flex flex-col sm:flex-row gap-3">
+                <Button asChild className="w-full text-center py-3 rounded-md flex items-center justify-center gap-2">
+                  <a
+                    href={waLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => {
+                      // tracking or small client-side action could go here
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M20.52 3.48A11.76 11.76 0 0 0 12 0C5.37 0 .02 5.35.02 12c0 2.12.56 4.18 1.63 6.02L0 24l6.2-1.61A11.94 11.94 0 0 0 12 24c6.63 0 12-5.35 12-12 0-3.19-1.24-6.19-3.48-8.52zM12 21.5c-1.7 0-3.36-.44-4.8-1.27l-.34-.19-3.68.95.98-3.58-.22-.37A9.5 9.5 0 1 1 21.5 12 9.49 9.49 0 0 1 12 21.5z" />
+                    </svg>
+                    Ir para o WhatsApp
+                  </a>
+                </Button>
+
+              </div>
+
+              <p className="text-xs text-muted-foreground max-w-md text-center mt-2">
+                Ao clicar, você será redirecionado ao WhatsApp com uma mensagem pré-preenchida. Seus dados não serão compartilhados com terceiros sem sua permissão.
+              </p>
             </div>
           </QuestionCard>
         );
-
-      // Tela 18: Oferta Exclusiva (Paywall)
-      case 18:
-        return (
-          <Paywall onSkip={() => nextStep()} />
-        );
-
-      // Tela 19: Conclusão e Início
-      case 19:
-        return (
-          <QuestionCard title="Tudo pronto!" subtitle="Sua jornada para uma vida mais saudável começa agora.">
-            <div className="py-8 text-center">
-              <button className="w-full max-w-md btn-primary" onClick={() => {
-                // finalizar e redirecionar para a aplicação principal
-                window.location.href = "/";
-              }}>
-                Começar a usar
-              </button>
-            </div>
-          </QuestionCard>
-        );
+      
 
       default:
         return (
