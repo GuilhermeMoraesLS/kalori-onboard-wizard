@@ -84,6 +84,20 @@ const Onboarding = () => {
     }
   };
 
+  // Função para atualizar os resultados da dieta após edição
+  const handleDietResultsChange = (newValues: { caloriasAlvo?: number; proteinas?: number; carboidratos?: number; gorduras?: number }) => {
+    const updatedDietResults = {
+      ...answers.dietResults,
+      ...newValues,
+      // Recalcular valores dependentes
+      kcalProteinas: (newValues.proteinas || answers.dietResults?.proteinas || 0) * 4,
+      kcalCarboidratos: (newValues.carboidratos || answers.dietResults?.carboidratos || 0) * 4,
+      kcalGorduras: (newValues.gorduras || answers.dietResults?.gorduras || 0) * 9,
+    };
+    
+    handleAnswer("dietResults", updatedDietResults);
+  };
+
   const nextStep = () => {
     setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
   };
@@ -440,7 +454,10 @@ const Onboarding = () => {
         return (
           <QuestionCard title="">
             {answers.dietResults ? (
-              <DietResults results={answers.dietResults} />
+              <DietResults 
+                results={answers.dietResults} 
+                onChange={handleDietResultsChange}
+              />
             ) : (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">Calculando seu plano...</p>

@@ -1,5 +1,9 @@
+import { useState, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface DietResultsProps {
   results: {
@@ -21,27 +25,77 @@ interface DietResultsProps {
     kcalGorduras: number;
     kcalCarboidratos: number;
   };
+  onChange?: (newValues: { caloriasAlvo?: number; proteinas?: number; carboidratos?: number; gorduras?: number }) => void;
 }
 
-export const DietResults = ({ results }: DietResultsProps) => {
+export const DietResults = ({ results, onChange }: DietResultsProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedValues, setEditedValues] = useState({
+    caloriasAlvo: results.caloriasAlvo,
+    proteinas: results.proteinas,
+    carboidratos: results.carboidratos,
+    gorduras: results.gorduras,
+  });
+
+  // Atualizar editedValues quando results mudar (exceto durante edição)
+  useEffect(() => {
+    if (!isEditing) {
+      setEditedValues({
+        caloriasAlvo: results.caloriasAlvo,
+        proteinas: results.proteinas,
+        carboidratos: results.carboidratos,
+        gorduras: results.gorduras,
+      });
+    }
+  }, [results, isEditing]);
+
+  const handleInputChange = (field: string, value: string) => {
+    const numValue = parseInt(value) || 0;
+    setEditedValues(prev => ({
+      ...prev,
+      [field]: numValue
+    }));
+  };
+
+  const handleSaveChanges = () => {
+    if (onChange) {
+      onChange(editedValues);
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditedValues({
+      caloriasAlvo: results.caloriasAlvo,
+      proteinas: results.proteinas,
+      carboidratos: results.carboidratos,
+      gorduras: results.gorduras,
+    });
+    setIsEditing(false);
+  };
+
+  // Usar valores exibidos (results ou editedValues baseado no modo)
+  const displayValues = isEditing ? editedValues : results;
+  
   const {
     caloriasAlvo,
     proteinas,
     carboidratos,
     gorduras,
-    kcalProteinas,
-    kcalGorduras,
-    kcalCarboidratos,
     tmb,
     neat,
     objetivo,
   } = results;
 
+  // Calcular kcal baseado nos valores exibidos
+  const kcalProteinas = displayValues.proteinas * 4;
+  const kcalCarboidratos = displayValues.carboidratos * 4;
+  const kcalGorduras = displayValues.gorduras * 9;
   const totalKcal = kcalProteinas + kcalGorduras + kcalCarboidratos;
 
-  const proteinasPercent = (kcalProteinas / totalKcal) * 100;
-  const carboidratosPercent = (kcalCarboidratos / totalKcal) * 100;
-  const gordurasPercent = (kcalGorduras / totalKcal) * 100;
+  const proteinasPercent = totalKcal > 0 ? (kcalProteinas / totalKcal) * 100 : 0;
+  const carboidratosPercent = totalKcal > 0 ? (kcalCarboidratos / totalKcal) * 100 : 0;
+  const gordurasPercent = totalKcal > 0 ? (kcalGorduras / totalKcal) * 100 : 0;
 
   const objetivoTexto = objetivo === "emagrecer" 
     ? "Perder Peso" 
@@ -63,7 +117,8 @@ export const DietResults = ({ results }: DietResultsProps) => {
           Seu Plano Personalizado
         </h2>
         <p className="text-muted-foreground">
-          Baseado em suas informações e objetivos
+          Baseado em suas informações e objetivos. 
+          Caso você já tenha uma dieta basta clicar em <strong>"Editar Dieta"</strong> para ajustar os valores conforme sua necessidade.
         </p>
       </div>
 
@@ -73,10 +128,25 @@ export const DietResults = ({ results }: DietResultsProps) => {
           <p className="text-sm text-muted-foreground uppercase tracking-wide mb-2">
             Meta Diária de Calorias
           </p>
-          <div className="text-6xl font-bold text-primary mb-2">
-            {caloriasAlvo}
-            <span className="text-2xl ml-2">kcal</span>
-          </div>
+          {isEditing ? (
+            <div className="space-y-2">
+              <Label htmlFor="caloriasAlvo" className="text-base font-medium">Calorias (kcal)</Label>
+              <Input
+                id="caloriasAlvo"
+                type="number"
+                value={editedValues.caloriasAlvo}
+                onChange={(e) => handleInputChange('caloriasAlvo', e.target.value)}
+                className="text-center text-2xl font-bold h-16"
+                min="800"
+                max="5000"
+              />
+            </div>
+          ) : (
+            <div className="text-6xl font-bold text-primary mb-2">
+              {displayValues.caloriasAlvo}
+              <span className="text-2xl ml-2">kcal</span>
+            </div>
+          )}
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <span>TMB: {tmb} kcal</span>
             <span>•</span>
@@ -85,33 +155,46 @@ export const DietResults = ({ results }: DietResultsProps) => {
         </div>
       </Card>
 
-      {/* Macros - Gráfico de Pizza Visual */}
+      {/* Macros */}
       <Card className="p-6">
-        <h3 className="text-xl font-semibold mb-4 text-center">
-          Distribuição de Macronutrientes
-        </h3>
-        
-        {/* Barra de progresso visual como "pizza" */}
-        <div className="relative h-8 rounded-full overflow-hidden flex mb-6">
-          <div 
-            className="bg-blue-500 flex items-center justify-center text-white text-xs font-semibold transition-all"
-            style={{ width: `${proteinasPercent}%` }}
-          >
-            {proteinasPercent > 15 && `${Math.round(proteinasPercent)}%`}
-          </div>
-          <div 
-            className="bg-amber-500 flex items-center justify-center text-white text-xs font-semibold transition-all"
-            style={{ width: `${carboidratosPercent}%` }}
-          >
-            {carboidratosPercent > 15 && `${Math.round(carboidratosPercent)}%`}
-          </div>
-          <div 
-            className="bg-red-500 flex items-center justify-center text-white text-xs font-semibold transition-all"
-            style={{ width: `${gordurasPercent}%` }}
-          >
-            {gordurasPercent > 15 && `${Math.round(gordurasPercent)}%`}
-          </div>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold">
+            Distribuição de Macronutrientes
+          </h3>
+          {!isEditing && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsEditing(true)}
+            >
+              Editar Dieta
+            </Button>
+          )}
         </div>
+
+        {/* Barra de progresso visual (apenas no modo visualização) */}
+        {!isEditing && (
+          <div className="relative h-8 rounded-full overflow-hidden flex mb-6">
+            <div 
+              className="bg-blue-500 flex items-center justify-center text-white text-xs font-semibold transition-all"
+              style={{ width: `${proteinasPercent}%` }}
+            >
+              {proteinasPercent > 15 && `${Math.round(proteinasPercent)}%`}
+            </div>
+            <div 
+              className="bg-amber-500 flex items-center justify-center text-white text-xs font-semibold transition-all"
+              style={{ width: `${carboidratosPercent}%` }}
+            >
+              {carboidratosPercent > 15 && `${Math.round(carboidratosPercent)}%`}
+            </div>
+            <div 
+              className="bg-red-500 flex items-center justify-center text-white text-xs font-semibold transition-all"
+              style={{ width: `${gordurasPercent}%` }}
+            >
+              {gordurasPercent > 15 && `${Math.round(gordurasPercent)}%`}
+            </div>
+          </div>
+        )}
 
         {/* Detalhes dos Macros */}
         <div className="space-y-4">
@@ -127,8 +210,25 @@ export const DietResults = ({ results }: DietResultsProps) => {
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-foreground">{proteinas}g</p>
-              <p className="text-xs text-muted-foreground">{kcalProteinas} kcal</p>
+              {isEditing ? (
+                <div className="space-y-1">
+                  <Label htmlFor="proteinas" className="text-xs">Gramas</Label>
+                  <Input
+                    id="proteinas"
+                    type="number"
+                    value={editedValues.proteinas}
+                    onChange={(e) => handleInputChange('proteinas', e.target.value)}
+                    className="w-20 text-right"
+                    min="50"
+                    max="500"
+                  />
+                </div>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-foreground">{displayValues.proteinas}g</p>
+                  <p className="text-xs text-muted-foreground">{kcalProteinas} kcal</p>
+                </>
+              )}
             </div>
           </div>
 
@@ -144,8 +244,25 @@ export const DietResults = ({ results }: DietResultsProps) => {
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-foreground">{carboidratos}g</p>
-              <p className="text-xs text-muted-foreground">{kcalCarboidratos} kcal</p>
+              {isEditing ? (
+                <div className="space-y-1">
+                  <Label htmlFor="carboidratos" className="text-xs">Gramas</Label>
+                  <Input
+                    id="carboidratos"
+                    type="number"
+                    value={editedValues.carboidratos}
+                    onChange={(e) => handleInputChange('carboidratos', e.target.value)}
+                    className="w-20 text-right"
+                    min="50"
+                    max="800"
+                  />
+                </div>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-foreground">{displayValues.carboidratos}g</p>
+                  <p className="text-xs text-muted-foreground">{kcalCarboidratos} kcal</p>
+                </>
+              )}
             </div>
           </div>
 
@@ -161,11 +278,47 @@ export const DietResults = ({ results }: DietResultsProps) => {
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-foreground">{gorduras}g</p>
-              <p className="text-xs text-muted-foreground">{kcalGorduras} kcal</p>
+              {isEditing ? (
+                <div className="space-y-1">
+                  <Label htmlFor="gorduras" className="text-xs">Gramas</Label>
+                  <Input
+                    id="gorduras"
+                    type="number"
+                    value={editedValues.gorduras}
+                    onChange={(e) => handleInputChange('gorduras', e.target.value)}
+                    className="w-20 text-right"
+                    min="30"
+                    max="300"
+                  />
+                </div>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-foreground">{displayValues.gorduras}g</p>
+                  <p className="text-xs text-muted-foreground">{kcalGorduras} kcal</p>
+                </>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Botões de edição (apenas no modo edição) */}
+        {isEditing && (
+          <div className="flex gap-3 mt-6">
+            <Button 
+              onClick={handleSaveChanges}
+              className="flex-1"
+            >
+              Salvar Alterações
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={handleCancel}
+              className="flex-1"
+            >
+              Cancelar
+            </Button>
+          </div>
+        )}
       </Card>
 
       {/* Dicas baseadas no objetivo */}
