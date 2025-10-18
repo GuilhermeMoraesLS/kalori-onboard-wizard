@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Slider } from "@/components/ui/slider";
 
 interface HeightPickerProps {
   value?: number;
@@ -21,18 +22,14 @@ export const HeightPicker = ({ value = 170, onChange }: HeightPickerProps) => {
           <span className="text-3xl text-muted-foreground ml-2">cm</span>
         </div>
       </div>
-      <input
-        type="range"
-        min="120"
-        max="220"
-        value={height}
-        onChange={(e) => handleChange(parseInt(e.target.value))}
-        className="w-full h-3 bg-secondary rounded-full appearance-none cursor-pointer accent-primary"
+      <Slider
+        min={120}
+        max={220}
+        step={1}
+        value={[height]}
+        onValueChange={(valueArray) => handleChange(valueArray[0])}
+        className="w-full"
       />
-      <div className="flex justify-between text-sm text-muted-foreground mt-2">
-        <span>120 cm</span>
-        <span>220 cm</span>
-      </div>
     </div>
   );
 };

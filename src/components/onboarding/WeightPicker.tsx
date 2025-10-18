@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Slider } from "@/components/ui/slider";
 
 interface WeightPickerProps {
   value?: number;
@@ -21,18 +22,14 @@ export const WeightPicker = ({ value = 70, onChange }: WeightPickerProps) => {
           <span className="text-3xl text-muted-foreground ml-2">kg</span>
         </div>
       </div>
-      <input
-        type="range"
-        min="40"
-        max="200"
-        value={weight}
-        onChange={(e) => handleChange(parseInt(e.target.value))}
-        className="w-full h-3 bg-secondary rounded-full appearance-none cursor-pointer accent-primary"
+      <Slider
+        min={40}
+        max={200}
+        step={1}
+        value={[weight]}
+        onValueChange={(valueArray) => handleChange(valueArray[0])}
+        className="w-full"
       />
-      <div className="flex justify-between text-sm text-muted-foreground mt-2">
-        <span>40 kg</span>
-        <span>200 kg</span>
-      </div>
     </div>
   );
 };

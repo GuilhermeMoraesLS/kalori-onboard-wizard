@@ -5,6 +5,7 @@ import { QuestionCard } from "@/components/onboarding/QuestionCard";
 import { OptionButton } from "@/components/onboarding/OptionButton";
 import { ContinueButton } from "@/components/onboarding/ContinueButton";
 import { Target, TrendingDown, TrendingUp, Minus } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 
 // novos componentes
 import { DOBPicker } from "@/components/onboarding/DOBPicker";
@@ -155,18 +156,14 @@ const Onboarding = () => {
                   <span className="text-3xl text-muted-foreground ml-2">kg</span>
                 </div>
               </div>
-              <input
-                type="range"
-                min="40"
-                max="150"
-                value={answers.targetWeight || 70}
-                onChange={(e) => handleAnswer("targetWeight", parseInt(e.target.value))}
-                className="w-full h-3 bg-secondary rounded-full appearance-none cursor-pointer accent-primary"
+              <Slider
+                min={40}
+                max={150}
+                step={1}
+                value={[answers.targetWeight || 70]}
+                onValueChange={(valueArray) => handleAnswer("targetWeight", valueArray[0])}
+                className="w-full"
               />
-              <div className="flex justify-between text-sm text-muted-foreground mt-2">
-                <span>40 kg</span>
-                <span>150 kg</span>
-              </div>
             </div>
             <ContinueButton onClick={nextStep} disabled={!answers.targetWeight} />
           </QuestionCard>
@@ -211,16 +208,16 @@ const Onboarding = () => {
                   {answers.speed === "slow" ? "Devagar e sempre" : answers.speed === "moderate" ? "Moderado" : "Rápido"}
                 </p>
               </div>
-              <input
-                type="range"
-                min="1"
-                max="3"
-                value={answers.speed === "slow" ? 1 : answers.speed === "moderate" ? 2 : 3}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value);
+              <Slider
+                min={1}
+                max={3}
+                step={1}
+                value={[answers.speed === "slow" ? 1 : answers.speed === "moderate" ? 2 : 3]}
+                onValueChange={(valueArray) => {
+                  const val = valueArray[0];
                   handleAnswer("speed", val === 1 ? "slow" : val === 2 ? "moderate" : "fast");
                 }}
-                className="w-full h-3 bg-secondary rounded-full appearance-none cursor-pointer accent-primary"
+                className="w-full"
               />
             </div>
             <ContinueButton onClick={nextStep} text="Continuar" />
