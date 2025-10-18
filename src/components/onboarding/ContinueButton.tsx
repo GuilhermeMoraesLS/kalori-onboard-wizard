@@ -13,7 +13,7 @@ export const ContinueButton = ({ onClick, disabled = false, text = "Continuar" }
       <Button
         onClick={onClick}
         disabled={disabled}
-        className={`w-full max-w-md mx-auto flex items-center justify-center gap-2 h-14 text-lg font-semibold rounded-2xl transition-all duration-300 ${
+        className={`w-full max-w-md mx-auto flex items-center justify-center gap-2 h-12 text-lg font-semibold rounded-2xl transition-all duration-300 ${
           disabled ? "opacity-50 cursor-not-allowed" : "hover:scale-[1.02] active:scale-[0.98] shadow-lg"
         }`}
       >

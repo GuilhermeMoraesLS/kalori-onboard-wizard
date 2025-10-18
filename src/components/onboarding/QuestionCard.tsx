@@ -20,7 +20,7 @@ export const QuestionCard = ({
 }: QuestionCardProps) => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 animate-fade-in">
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md space-y-8 pb-28">
         {/* Imagem centralizada no topo */}
         <div className="flex justify-center">
           <img
