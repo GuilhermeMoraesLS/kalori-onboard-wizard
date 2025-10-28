@@ -493,13 +493,14 @@ const Onboarding = () => {
       // Tela 19: Seu Plano Personalizado — direciona para WhatsApp
       case 19:
         // O número já vem completo (ex: "5531999614643"), não precisa concatenar countryCode
-        const phoneNumber = answers.phone?.number || "5521982482829";
-        const waLink = `https://wa.me/5521982482829?text=${encodeURIComponent("Olá! Acabei de completar meu perfil no Kalorix e quero começar minha jornada de reprogramação nutricional! 🎯")}`;
+        //const phoneNumber = answers.phone?.number || "5521982482829";
+        //const waLink = `https://wa.me/5521982482829?text=${encodeURIComponent("Olá! Acabei de completar meu perfil no Kalorix e quero começar minha jornada de reprogramação nutricional! 🎯")}`;
 
+        const linkPlataforma = 'https://kalorix-hub-progress.vercel.app/'
         return (
           <QuestionCard
             title="Parabéns! Seu plano está pronto! 🎉"
-            subtitle="Agora vamos conectar você ao WhatsApp para começar sua jornada."
+            subtitle="Você será redirecionado a nossa plataforma web."
           >
             <div className="flex flex-col items-center gap-6 mt-6">
               <div className="w-40 h-40 rounded-full bg-gradient-to-br from-green-600 to-green-500 flex items-center justify-center shadow-2xl animate-bounce-in">
@@ -531,8 +532,7 @@ const Onboarding = () => {
               </div>
 
               <p className="text-center text-lg text-foreground max-w-md leading-relaxed">
-                Montamos um plano pensado especialmente em você — com metas, refeições e dicas práticas.
-                Clique no botão abaixo para começar sua jornada rumo à reprogramação nutricional! 💪
+                No nosso app você fará login com o seu número e receberá o acesso pelo whatsapp.
               </p>
 
               <div className="w-full max-w-md flex flex-col sm:flex-row gap-3">
@@ -546,11 +546,11 @@ const Onboarding = () => {
                     
                     // Redirecionar para WhatsApp após salvar (ou mesmo se falhar)
                     if (saved || true) { // Sempre redireciona, mesmo se falhar ao salvar
-                      window.open(waLink, '_blank');
+                      window.open(linkPlataforma, '_blank');
                     }
                   }}
                   disabled={isSaving}
-                  className="w-full text-center py-6 text-lg rounded-md flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                  className="w-full text-center py-6 text-lg rounded-md flex items-center justify-center gap-2 bg-[rgb(254,84,25)] hover:bg-[rgba(255,172,145,1)] disabled:opacity-50"
                 >
                   {isSaving ? (
                     <>
@@ -559,17 +559,14 @@ const Onboarding = () => {
                     </>
                   ) : (
                     <>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20.52 3.48A11.76 11.76 0 0 0 12 0C5.37 0 .02 5.35.02 12c0 2.12.56 4.18 1.63 6.02L0 24l6.2-1.61A11.94 11.94 0 0 0 12 24c6.63 0 12-5.35 12-12 0-3.19-1.24-6.19-3.48-8.52zM12 21.5c-1.7 0-3.36-.44-4.8-1.27l-.34-.19-3.68.95.98-3.58-.22-.37A9.5 9.5 0 1 1 21.5 12 9.49 9.49 0 0 1 12 21.5z" />
-                      </svg>
-                      Começar no WhatsApp
+                      Começar no WebApp
                     </>
                   )}
                 </Button>
               </div>
 
               <p className="text-xs text-muted-foreground max-w-md text-center mt-2">
-                Ao clicar, você será redirecionado ao WhatsApp. Seus dados são criptografados e não serão compartilhados com terceiros.
+                Ao clicar, você será redirecionado ao nosso webApp. Seus dados são não serão compartilhados com terceiros.
               </p>
             </div>
           </QuestionCard>
