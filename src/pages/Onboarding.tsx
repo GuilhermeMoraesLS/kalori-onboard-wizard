@@ -542,12 +542,10 @@ const Onboarding = () => {
                     handleAnswer("completed", true);
                     
                     // Salvar no Supabase
-                    const saved = await handleSaveToSupabase();
+                    await handleSaveToSupabase();
                     
-                    // Redirecionar para WhatsApp após salvar (ou mesmo se falhar)
-                    if (saved || true) { // Sempre redireciona, mesmo se falhar ao salvar
-                      window.open(linkPlataforma, '_blank');
-                    }
+                    // Redirecionar na mesma aba
+                    window.location.href = linkPlataforma;
                   }}
                   disabled={isSaving}
                   className="w-full text-center py-6 text-lg rounded-md flex items-center justify-center gap-2 bg-[rgb(254,84,25)] hover:bg-[rgba(255,172,145,1)] disabled:opacity-50"
